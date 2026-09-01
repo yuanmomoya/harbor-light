@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+
+CONSOLE_USER=$(stat -f '%Su' /dev/console)
+if [[ -z "${CONSOLE_USER}" || "${CONSOLE_USER}" == "root" || "${CONSOLE_USER}" == "loginwindow" ]]; then
+  CONSOLE_USER="${SUDO_USER:-}"
+fi
+if [[ -n "${CONSOLE_USER}" && "${CONSOLE_USER}" != "root" ]]; then
+  USER_UID=$(id -u "${CONSOLE_USER}")
+  /usr/bin/killall -u "${CONSOLE_USER}" harbor-light 2>/dev/null || true
+  /usr/bin/killall -u "${CONSOLE_USER}" codex-light 2>/dev/null || true
+  /bin/launchctl bootout "gui/${USER_UID}/com.harborlight.app" 2>/dev/null || true
+  /bin/launchctl bootout "gui/${USER_UID}/com.codexlight.app" 2>/dev/null || true
+fi
+exit 0

@@ -1,0 +1,45 @@
+#!/bin/bash
+# pkg 安装后配置：hooks + LaunchAgent。配置失败不让整个安装回滚。
+set -u
+
+DEST="${2:-/Applications}"
+APP="${DEST}/HarborLight.app"
+if [[ ! -x "${APP}/Contents/MacOS/harbor-light" ]]; then
+  APP="/Applications/HarborLight.app"
+fi
+BIN="${APP}/Contents/MacOS/harbor-light"
+
+if [[ ! -x "$BIN" ]]; then
+  echo "警告：未找到 ${APP}，跳过 hook 配置" >&2
+  exit 0
+fi
+
+CONSOLE_USER=$(stat -f '%Su' /dev/console 2>/dev/null || true)
+if [[ -z "${CONSOLE_USER}" || "${CONSOLE_USER}" == "root" || "${CONSOLE_USER}" == "loginwindow" ]]; then
+  CONSOLE_USER="${SUDO_USER:-}"
+fi
+if [[ -z "${CONSOLE_USER}" || "${CONSOLE_USER}" == "root" ]]; then
+  echo "警告：无法确定登录用户，跳过 hook 配置" >&2
+  exit 0
+fi
+
+USER_HOME=$(dscl . -read "/Users/${CONSOLE_USER}" NFSHomeDirectory 2>/dev/null | awk '{print $2}')
+USER_HOME="${USER_HOME:-/Users/${CONSOLE_USER}}"
+USER_UID=$(id -u "${CONSOLE_USER}" 2>/dev/null || true)
+if [[ -z "${USER_UID}" ]]; then
+  echo "警告：无法解析用户 UID，跳过 hook 配置" >&2
+  exit 0
+fi
+
+/usr/bin/killall -u "${CONSOLE_USER}" harbor-light 2>/dev/null || true
+/usr/bin/killall -u "${CONSOLE_USER}" codex-light 2>/dev/null || true
+/bin/launchctl bootout "gui/${USER_UID}/com.harborlight.app" 2>/dev/null || true
+/bin/launchctl bootout "gui/${USER_UID}/com.codexlight.app" 2>/dev/null || true
+
+if ! /bin/launchctl asuser "${USER_UID}" /usr/bin/sudo -u "${CONSOLE_USER}" \
+  /usr/bin/env HOME="${USER_HOME}" "${BIN}" install --dest "${APP}" --skip-bundle
+then
+  echo "警告：hook / 开机自启配置失败，App 已装到 ${APP}" >&2
+fi
+
+exit 0

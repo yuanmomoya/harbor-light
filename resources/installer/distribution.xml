@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <title>Harbor Light</title>
+    <organization>com.harborlight</organization>
+    <options customize="never" require-scripts="false"/>
+    <welcome file="welcome.html" mime-type="text/html"/>
+    <pkg-ref id="com.harborlight.app"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.harborlight.app"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.harborlight.app" visible="false">
+        <pkg-ref id="com.harborlight.app"/>
+    </choice>
+    <pkg-ref id="com.harborlight.app" version="0.1.0" onConclusion="none">HarborLight-component.pkg</pkg-ref>
+</installer-gui-script>

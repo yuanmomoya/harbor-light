@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">
+  <defs>
+    <filter id="tileShadow" x="18" y="28" width="988" height="996" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="26" flood-color="#171717" flood-opacity="0.18"/>
+    </filter>
+    <filter id="bubbleShadow" x="110" y="298" width="810" height="458" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#111214" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#tileShadow)">
+    <rect x="72" y="64" width="880" height="880" rx="224" fill="#F4F1EA"/>
+    <rect x="73.5" y="65.5" width="877" height="877" rx="222.5" stroke="#16181B" stroke-opacity="0.08" stroke-width="3"/>
+  </g>
+
+  <g filter="url(#bubbleShadow)">
+    <path d="M318 332H706C798.784 332 874 407.216 874 500C874 564.678 837.444 620.83 783.854 648.932C794.79 673.238 814.341 696.328 844 716C793.789 715.592 748.654 695.652 715.617 663.846C712.42 663.948 709.215 664 706 664H318C225.216 664 150 588.784 150 496C150 407.216 225.216 332 318 332Z" fill="#191B1E"/>
+  </g>
+
+  <circle cx="338" cy="496" r="88" fill="#0E1012"/>
+  <circle cx="338" cy="496" r="72" fill="#FF504A"/>
+
+  <circle cx="512" cy="496" r="88" fill="#0E1012"/>
+  <circle cx="512" cy="496" r="72" fill="#FFB719"/>
+
+  <circle cx="686" cy="496" r="88" fill="#0E1012"/>
+  <circle cx="686" cy="496" r="72" fill="#2CCF72"/>
+
+  <path d="M358 460L315 496L358 532" stroke="#FFFDF8" stroke-opacity="0.82" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M535 452L489 540" stroke="#FFFDF8" stroke-opacity="0.82" stroke-width="24" stroke-linecap="round"/>
+  <path d="M666 460L709 496L666 532" stroke="#FFFDF8" stroke-opacity="0.82" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

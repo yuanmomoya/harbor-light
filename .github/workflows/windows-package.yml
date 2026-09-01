@@ -1,0 +1,49 @@
+name: Windows packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Windows ${{ matrix.arch }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        shell: pwsh
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+
+      - name: Ensure Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup --yes --no-progress
+          }
+
+      - name: Build portable zip and installer
+        shell: pwsh
+        run: ./scripts/package-windows.ps1 -Architecture ${{ matrix.arch }} -RequireInstaller
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: HarborLight-windows-${{ matrix.arch }}
+          path: |
+            dist/windows/*.zip
+            dist/windows/*.exe
+            dist/windows/*.sha256
+          if-no-files-found: error
