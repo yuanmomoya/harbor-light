@@ -7,7 +7,7 @@ on:
       - "v*"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   package:
@@ -47,3 +47,43 @@ jobs:
             dist/windows/*.exe
             dist/windows/*.sha256
           if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows packages
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/windows
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/windows/*
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          body: |
+            ## Windows 安装包
+
+            推荐下载 `HarborLight-*-windows-*-setup.exe`，双击即可安装。安装器以当前用户权限写入 `%LOCALAPPDATA%\HarborLight`，会合并 Codex / Cursor 用户级 Hooks，并配置登录自启动，不需要管理员权限。
+
+            | 文件 | 用途 |
+            | --- | --- |
+            | `*-setup.exe` | 双击安装（推荐） |
+            | `*.zip` | 便携包；解压后需先运行 `HarborLight.exe install` |
+            | `*.sha256` | SHA-256 校验 |
+
+            当前构建未做代码签名时，SmartScreen 可能提示“已阻止”。选择 **更多信息 → 仍要运行** 即可。
+
+            校验安装包：把下载的 `.exe` 和对应 `.sha256` 放在同一目录后执行
+
+            ```powershell
+            Get-FileHash .\HarborLight-*-windows-*-setup.exe -Algorithm SHA256
+            Get-Content .\HarborLight-*-windows-*-setup.exe.sha256
+            ```
+
+            两条命令的哈希应完全一致。

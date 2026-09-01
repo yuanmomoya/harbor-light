@@ -65,6 +65,8 @@ ___
 
 ## 二、安装（双击即可）
 
+正式版本请从 [GitHub Releases](https://github.com/yuanmomoya/harbor-light/releases) 下载，**不要**把 `dist/` 里的安装包提交进 Git。
+
 ### macOS
 
 把 `dist/HarborLight.pkg` 发给别人，**双击**就会打开 macOS 安装器，装到「应用程序」，并自动配置 Codex、Cursor 用户级 Hooks 和开机自启。
@@ -96,6 +98,59 @@ make package
 
 推荐分发 `HarborLight-0.1.0-windows-x64-setup.exe`；ARM Windows 使用 `arm64-setup.exe`。安装器以当前用户权限安装到 `%LOCALAPPDATA%\HarborLight`，自动合并 `%USERPROFILE%\.codex\hooks.json` 和 `%USERPROFILE%\.cursor\hooks.json`、写入当前用户登录自启动并启动悬浮窗，不需要管理员权限。
 
+当前本地 x64 安装包可以直接作为 GitHub Release 资源：
+
+| 文件 | 大小 | 能否上传 Release |
+| --- | --- | --- |
+| `dist/windows/HarborLight-0.1.0-windows-x64-setup.exe` | 约 2.5 MB | 可以。远低于 GitHub 单个资源 **2 GiB** 上限 |
+| `dist/windows/HarborLight-0.1.0-windows-x64-setup.exe.sha256` | 106 字节 | 可以，且应和安装包一起发布，方便校验 |
+
+不要把这两个文件推进 Git 仓库：`.gitignore` 已排除 `/dist`，Git 也不是安装包的分发渠道。未代码签名时，Windows SmartScreen 可能拦截首次运行，选择 **更多信息 → 仍要运行** 即可。
+
+下载后可用 PowerShell 核对哈希（应与 `.sha256` 文件一致）：
+
+```powershell
+Get-FileHash .\HarborLight-0.1.0-windows-x64-setup.exe -Algorithm SHA256
+Get-Content .\HarborLight-0.1.0-windows-x64-setup.exe.sha256
+```
+
+本机这份安装包的 SHA-256 为：
+
+```text
+b2b3134d1c2e7e4f091c54c8ea9059cab1aa840d8cd7f3de76bae4e4e4e8f644
+```
+
+把这份本地包发到 GitHub Releases（网页或 CLI 均可）：
+
+1. 打开 [New release](https://github.com/yuanmomoya/harbor-light/releases/new)
+2. 标签填 `v0.1.0`（没有该标签时 GitHub 会创建），标题填 `Harbor Light 0.1.0`
+3. 上传 `HarborLight-0.1.0-windows-x64-setup.exe` 和 `.sha256`（可选再加同目录的 `.zip`）
+4. 说明可直接用下面这段：
+
+```markdown
+## Windows x64
+
+推荐下载 `HarborLight-0.1.0-windows-x64-setup.exe`，双击安装。安装器以当前用户权限写入 `%LOCALAPPDATA%\HarborLight`，会合并 Codex / Cursor 用户级 Hooks，并配置登录自启动，不需要管理员权限。
+
+当前包未做代码签名。若 SmartScreen 提示已阻止，选择 **更多信息 → 仍要运行**。
+
+SHA-256：`b2b3134d1c2e7e4f091c54c8ea9059cab1aa840d8cd7f3de76bae4e4e4e8f644`
+```
+
+已安装 [GitHub CLI](https://cli.github.com/) 时也可以：
+
+```powershell
+git tag v0.1.0
+git push origin v0.1.0
+gh release create v0.1.0 `
+  dist/windows/HarborLight-0.1.0-windows-x64-setup.exe `
+  dist/windows/HarborLight-0.1.0-windows-x64-setup.exe.sha256 `
+  --title "Harbor Light 0.1.0" `
+  --notes "推荐下载 setup.exe 双击安装。未签名时 SmartScreen 可能拦截，选择更多信息 → 仍要运行。SHA-256: b2b3134d1c2e7e4f091c54c8ea9059cab1aa840d8cd7f3de76bae4e4e4e8f644"
+```
+
+推送 `v*` 标签还会触发 Actions，由 CI 再构建 x64 / ARM64 并挂到同一个 Release。CI 产物的哈希会和本机这份不同，这是正常的。
+
 在 Windows PowerShell 7 中打包：
 
 ```powershell
@@ -104,7 +159,7 @@ make package
 ./scripts/package-windows.ps1 -Architecture arm64 -RequireInstaller
 ```
 
-需要 Rust、MSVC Build Tools（勾选「Desktop development with C++」）和 [Inno Setup 6](https://jrsoftware.org/isinfo.php)。也可从 GitHub Actions 手动运行 **Windows packages**（推送 `v*` 标签也会触发），流水线会同时生成 x64 / ARM64：
+需要 Rust、MSVC Build Tools（勾选「Desktop development with C++」）和 [Inno Setup 6](https://jrsoftware.org/isinfo.php)。也可从 GitHub Actions 手动运行 **Windows packages**（推送 `v*` 标签也会触发），流水线会同时生成 x64 / ARM64，并在打标签时自动发布到 [GitHub Releases](https://github.com/yuanmomoya/harbor-light/releases)：
 
 | 文件 | 用途 |
 | --- | --- |
