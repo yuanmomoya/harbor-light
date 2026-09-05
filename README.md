@@ -377,3 +377,13 @@ Windows 可在「设置 → 应用」中卸载，也可执行：
 ```
 
 卸载会停止 App → 移除 LaunchAgent / 当前用户注册表自启动 → 只清理 Codex、Cursor `hooks.json` 中本工具写入的条目 → 删除活动状态、日志和窗口位置，不会覆盖或删除用户已有的其他 Hooks。
+
+___
+
+## 微信公众号
+
+关注「程序员小袁」，获取编程干货、开发笔记和 AI 工具相关内容。下图是微信公众号二维码，用微信扫码即可关注。
+
+<p align="center">
+  <img src="resources/wx-logo.png" width="280" alt="程序员小袁微信公众号二维码">
+</p>
